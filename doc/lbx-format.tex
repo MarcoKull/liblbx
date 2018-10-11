@@ -11,16 +11,16 @@
 \author{Marco Kull - \href{mailto:marco_kull@web.de}{marco\_kull@web.de}}\date{}
 \maketitle
 \thispagestyle{empty}
-
+\pagestyle{empty}
 The lbx file format is a simple container that consist of a header followed by multiple concatenated files. It is used in some old DOS games developed by SimTex:
 \begin{itemize}
 \item[-] Master of Magic
-\item[-] Master of Orion 1
+\item[-] Master of Orion
 \item[-] Master of Orion 2
 \item[-] 1830: Railroads \& Robber Barons
 \end{itemize}
-
-Some files in these games have a .LBX suffix but aren't real lbx file containers. This also seems to be true for all lbx files contained in StarLords - a precessor of Master of Orion 1.\\\\
+Some files in these games have a .LBX suffix but aren't real lbx file containers. This also seems to be true for all lbx files contained in StarLords - a precessor of Master of Orion.\\
+This documents primary function is to document my understanding of this file format. If you have any additional information on it please share it with me.\\\\
 A lbx file can be read like this:
 \begin{flushleft}
 \begin{tabular}{|l|l|l|l|}
@@ -28,8 +28,12 @@ A lbx file can be read like this:
 \textbf{Field} & \textbf{Size} & \textbf{Description}\\ 
 \hline \hline
 n & 2 bytes & Number of files contained in lbx archive.\\\hline
-offset & 4 bytes & n +1 offsets.\\\hline
+s & 4 bytes & Signature - always 65197\\\hline
+u0 & 2 bytes & Unknown (see below).\\\hline
+o & (n + 1) * 4 bytes & n +1 offsets.\\\hline
+u1 & (varies) & Unknown (see below).\\\hline
 data & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
+
 \end{tabular}
 \end{flushleft}
 
@@ -46,7 +50,7 @@ data & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
 \node[font=\tiny] at (2.1,2.7) {6};
 \draw (2.1, 2.5) -- (2.1, 2);
 	
-\node at (2.45,2.25) {?};
+\node at (2.45,2.25) {u0};
 \node[font=\tiny] at (2.8,2.7) {8};
 \draw (2.8, 2.5) -- (2.8, 2);
 	
@@ -63,7 +67,7 @@ data & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
 \node[font=\tiny] at (6.8,2.7) {4*(n+3)};
 \draw (6.8, 2.5) -- (6.8, 2);
 	
-\node at (7.4,2.25) {?};
+\node at (7.4,2.25) {u1};
 \node[font=\tiny] at (8,2.7) {offset 0};
 \draw (8, 2.5) -- (8, 2);
 	
@@ -79,11 +83,14 @@ data & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
 \node[font=\tiny] at (12.2,2.7) {offset n};
 
 \draw[arrows=->,line width=.5pt](3.5, 2)--(3.5,1.7)--(8,1.7)--(8,1.975);
-%\node[font=\tiny] at (3.9,1.5) {2048};
+%\node[font=\tiny] at (3.9,1.5) {2048}; % This is only true for moo2
 \draw[arrows=->,line width=.5pt](6.1, 2)--(6.1,1.5)--(12.2,1.5)--(12.2,1.975);
 \node[font=\tiny] at (6.7,1.3) {file size};
 \end{tikzpicture}
 \\\\
-The meaning two bytes between the signature (65197) and the first offset are unknown. Also sometimes there's a space between the last offset and the beginning of the file data containing data that doesn't seem to make any sense. In Master of Orion 2 the first offset is always 2048.
+The first unknown area are the two bytes between the signature (65197) and the first offset. In Master of Orion 2 it's always zero, but the other games contain some files with other values. There are some suggestions floating around on the internet like it being a version code, but nothing really convincing.\\\\
+The second unknown area is the space between the last offset. For Master of Orion 2 the data always starts at 2048, the data between the last offset and 2048 seems to have no meaning.\\
+For the other games it looks a little bit different. For most of the files the start of the data can be calculated \(32n + 512\). The headers size is always \(4n + 12\). Therefore the size of the unknown data is \(28n+500\). There are only a few files where this is different, so I assume that there is some information included here. In the following graph you can see the relation of the number of files to the start of the data:\\\\
+\includegraphics[width=\textwidth]{format-unknown1.png}
 \end{document}
 
