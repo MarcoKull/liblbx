@@ -19,7 +19,7 @@ The lbx file format is a simple container that consist of a header followed by m
 \item[-] Master of Orion 2
 \item[-] 1830: Railroads \& Robber Barons
 \end{itemize}
-Some files in these games have a .LBX suffix but aren't real lbx file containers. This also seems to be true for all lbx files contained in StarLords - a precessor of Master of Orion.\\
+Some files in these games have a LBX suffix but aren't real lbx file containers. This also seems to be true for all lbx files contained in StarLords - a precessor of Master of Orion.\\
 This documents primary function is to document my understanding of this file format. If you have any additional information on it please share it with me.\\\\
 A lbx file can be read like this:
 \begin{flushleft}
@@ -30,9 +30,9 @@ A lbx file can be read like this:
 n & 2 bytes & Number of files contained in lbx archive.\\\hline
 s & 4 bytes & Signature - always 65197\\\hline
 u0 & 2 bytes & Unknown (see below).\\\hline
-o & (n + 1) * 4 bytes & n +1 offsets.\\\hline
+offset i & (n + 1) * 4 bytes & n +1 offsets.\\\hline
 u1 & (varies) & Unknown (see below).\\\hline
-data & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
+data i & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
 
 \end{tabular}
 \end{flushleft}
@@ -89,7 +89,7 @@ data & (offset[i+1]-offset[i]) bytes & Raw file data.\\\hline
 \end{tikzpicture}
 \\\\
 The first unknown area are the two bytes between the signature (65197) and the first offset. In Master of Orion 2 it's always zero, but the other games contain some files with other values. There are some suggestions floating around on the internet like it being a version code, but nothing really convincing.\\\\
-The second unknown area is the space between the last offset. For Master of Orion 2 the data always starts at 2048, the data between the last offset and 2048 seems to have no meaning.\\
+The second unknown area is the space between the last offset and the beginning of the file data. For Master of Orion 2 the data always starts at 2048, the data between the last offset and 2048 seems to have no meaning.\\
 For the other games it looks a little bit different. For most of the files the start of the data can be calculated \(32n + 512\). The headers size is always \(4n + 12\). Therefore the size of the unknown data is \(28n+500\). There are only a few files where this is different, so I assume that there is some information included here. In the following graph you can see the relation of the number of files to the start of the data:\\\\
 \includegraphics[width=\textwidth]{format-unknown1.png}
 \end{document}
