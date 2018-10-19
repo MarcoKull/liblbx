@@ -58,12 +58,12 @@ LbxFile::Content& LbxFile::unknown1() {
 }
 
 #define LBX_WRITE_16(x) {\
-    uint16_t w16 = x; swap16(x);\
+    uint16_t w16 = x;\
     o.write((char*) &w16, 2);\
 }
 
 #define LBX_WRITE_32(x) {\
-    uint32_t w32 = x; swap32(x);\
+    uint32_t w32 = x;\
     o.write((char*) &w32, 4);\
 }
 
