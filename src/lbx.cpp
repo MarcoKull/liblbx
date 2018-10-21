@@ -1,6 +1,5 @@
 #include <fstream>
 #include <stdexcept>
-#include <iostream>
 
 #include "lbx.h"
 
@@ -32,6 +31,10 @@ LbxFile::Content& LbxFile::operator[](uint16_t _index) {
 
 LbxFile::Content& LbxFile::at(uint16_t _index) {
     return content[_index];
+}
+
+std::string LbxFile::path() {
+    return filePath;
 }
 
 void LbxFile::add(Content _content) {
@@ -67,6 +70,10 @@ LbxFile::Content& LbxFile::unknown1() {
     o.write((char*) &w32, 4);\
 }
 
+void LbxFile::save() {
+    save(path());
+}
+
 void LbxFile::save(std::string _path) {
     std::ofstream o(_path, std::ifstream::binary);
     if (!o.good()) {
@@ -89,6 +96,8 @@ void LbxFile::save(std::string _path) {
     for (uint16_t i = 0; i < size(); ++i) {
         o.write(at(i).data, at(i).size);
     }
+    
+    filePath = _path;
 }
 
 uint32_t LbxFile::offset(uint16_t _index) {
@@ -180,6 +189,7 @@ void LbxFile::open(std::string _path) {
     // file is good, clean up
     clear();
     delete[] u1.data;
+    filePath = _path;
 
     // save unknown data
     u0 = wtf;

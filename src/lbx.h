@@ -38,6 +38,12 @@ public:
     virtual ~LbxFile();
 
     /**
+     * Save lbx file.
+     * Throws exception if something goes wrong.
+     */
+    void save();
+    
+    /**
      * Save lbx file to given path.
      * Throws exception if something goes wrong.
      * @param path
@@ -51,6 +57,12 @@ public:
      * @param path
      */
     void open(std::string path);
+    
+    /**
+     * Get path of lbx file.
+     * @return path
+     */
+    std::string path();
 
     /**
      * Get number of files contained in the lbx archive.
@@ -158,6 +170,7 @@ private:
     uint16_t u0;
     Content u1;
     std::vector<Content> content;
+    std::string filePath;
 };
 
 #endif /* LBX_H */

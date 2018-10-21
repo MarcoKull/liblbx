@@ -37,7 +37,7 @@ uint8_t get(LbxFile::Content& content) {
 #define LBX_TEST_CMP(x, y, z){\
     if (y != z) {\
         std::stringstream e;\
-        e << msg << " test failed - " << x << " missmatch (" << (uint32_t)y << "!=" << (uint32_t)z << ")";\
+        e << msg << " test failed - " << x << " missmatch (" << y << "!=" << z << ")";\
         throw std::runtime_error(e.str());\
     }\
 }
@@ -81,10 +81,14 @@ void test() {
     }
 
     // test file class
+    std::string msg("class");
+    
     LbxFile lbx("test0.lbx");
+    LBX_TEST_CMP("path0", "test0.lbx", lbx.path())
     cmp("read", lbx, 42, 255,{0, 1, 2, 3, 4});
 
     lbx.save("test1.lbx");
+    LBX_TEST_CMP("path1", "test1.lbx", lbx.path())
     lbx.open("test1.lbx");
     cmp("save", lbx, 42, 255,{0, 1, 2, 3, 4});
 
