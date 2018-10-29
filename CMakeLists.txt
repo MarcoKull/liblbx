@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 project(liblbx)
 
 # compiler options
-add_definitions(-std=c++11 -pipe -pedantic -Wall -Wconversion)
+if(NOT MSVC)
+    add_definitions(-std=c++11 -pipe -pedantic -Wall -Wconversion)
+endif()
 
 # library with header file
 add_library(lbx src/lbx.cpp)

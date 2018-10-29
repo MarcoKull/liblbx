@@ -96,7 +96,7 @@ void LbxFile::save(std::string _path) {
     for (uint16_t i = 0; i < size(); ++i) {
         o.write(at(i).data, at(i).size);
     }
-    
+
     filePath = _path;
 }
 
@@ -171,7 +171,7 @@ void LbxFile::open(std::string _path) {
 
     uint16_t wtf;
     file.read((char*) &wtf, 2);
-    
+
     uint32_t* offsets = new uint32_t[nrOfFiles + 1];
     for (uint16_t i = 0; i <= nrOfFiles; ++i) {
         file.read((char*) & offsets[i], 4);
@@ -181,7 +181,7 @@ void LbxFile::open(std::string _path) {
         }
     }
 
-    if (fileSize != offsets[nrOfFiles]) {
+    if ((uint32_t) fileSize != offsets[nrOfFiles]) {
         delete[] offsets;
         LBX_OPEN_ERROR("offset");
     }
@@ -204,6 +204,6 @@ void LbxFile::open(std::string _path) {
         file.read(d, s);
         add(d, s);
     }
-    
+
     delete[] offsets;
 }
