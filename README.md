@@ -71,6 +71,7 @@ int main(int argc, char** argv) {
 
 ## First steps
 To get familiar with the API see the simple [class diagram](./doc/class-diagram.svg):
+
 ![class diagram](./doc/class-diagram.svg)
 
 If you are intrested any further have a look at the [file format description](./doc/lbx-format.pdf).

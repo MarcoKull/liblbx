@@ -11,27 +11,27 @@ const unsigned LBXTEST_DATA_STATIC_SIZE = 62;
 const uint8_t LBXTEST_DATA_STATIC[LBXTEST_DATA_STATIC_SIZE] = {5, 0, 173, 254, 0, 0, 42, 0, 37, 0, 0, 0, 42, 0, 0, 0, 47, 0, 0, 0, 52, 0, 0, 0, 57, 0, 0, 0, 62, 0, 0, 0, 116, 101, 115, 116, 255, 116, 101, 115, 116, 0, 116, 101, 115, 116, 1, 116, 101, 115, 116, 2, 116, 101, 115, 116, 3, 116, 101, 115, 116, 4};
 #endif /* LBXTEST_DATA_STATIC_H */
 
-LbxFile::Content gen(uint8_t nr) {
-    LbxFile::Content c;
-    c.data = new char[5];
-    c.data[0] = 't';
-    c.data[1] = 'e';
-    c.data[2] = 's';
-    c.data[3] = 't';
-    c.data[4] = (char) nr;
-    c.size = 5;
-    return c;
+std::pair<char*, uint32_t> gen(uint8_t nr) {
+    std::pair<char*, uint32_t> p;
+    p.first = new char[5];
+    p.first[0] = 't';
+    p.first[1] = 'e';
+    p.first[2] = 's';
+    p.first[3] = 't';
+    p.first[4] = (char) nr;
+    p.second = 5;
+    return p;
 }
 
-uint8_t get(LbxFile::Content& content) {
-    if (content.size != 5
-            || content.data[0] != 't'
-            || content.data[1] != 'e'
-            || content.data[2] != 's'
-            || content.data[3] != 't') {
+uint8_t get(std::pair<char*, uint32_t>& content) {
+    if (content.second != 5
+            || content.first[0] != 't'
+            || content.first[1] != 'e'
+            || content.first[2] != 's'
+            || content.first[3] != 't') {
         throw std::runtime_error("invalid content");
     }
-    return (uint8_t) content.data[4];
+    return (uint8_t) content.first[4];
 }
 
 #define LBX_TEST_CMP(x, y, z){\
@@ -119,7 +119,7 @@ void test() {
     lbx.unknown0() = 7;
     cmp("unknown0", lbx, 7, 255,{4, 3, 2, 1, 0, 5});
 
-    delete[] lbx.unknown1().data;
+    delete[] lbx.unknown1().first;
     lbx.unknown1() = gen(23);
     cmp("unknown1", lbx, 7, 23,{4, 3, 2, 1, 0, 5});
 

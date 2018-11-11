@@ -12,15 +12,6 @@ class LbxFile {
 public:
 
     /**
-     * Simple container class to hold archived files.
-     */
-    class Content {
-    public:
-        char* data;
-        uint32_t size;
-    };
-
-    /**
      * A new empty lbx file.
      */
     LbxFile();
@@ -75,14 +66,14 @@ public:
      * @param index
      * @return content
      */
-    Content& at(uint16_t index);
+    std::pair<char*, uint32_t>& at(uint16_t index);
 
     /**
      * Get content at given index.
      * @param index
      * @return content
      */
-    Content& operator[](uint16_t index);
+    std::pair<char*, uint32_t>& operator[](uint16_t index);
 
     /**
      * Calculate starting offset for given index.
@@ -102,15 +93,7 @@ public:
      * Added data will be deleted by this class.
      * @param content
      */
-    void add(Content content);
-
-    /**
-     * Add content to archive.
-     * Added data will be deleted by this class.
-     * @param data
-     * @param size
-     */
-    void add(char* data, uint32_t size);
+    void add(std::pair<char*, uint32_t> content);
 
     /**
      * Insert content at given index.
@@ -118,7 +101,7 @@ public:
      * @param index
      * @param content
      */
-    void insert(uint16_t index, Content content);
+    void insert(uint16_t index, std::pair<char*, uint32_t> content);
 
     /**
      * Switch content at given indexes.
@@ -143,7 +126,7 @@ public:
      * Get and set unknown space.
      * @return content reference
      */
-    Content& unknown1();
+    std::pair<char*, uint32_t>& unknown1();
 
     /**
      * Calculate header size.
@@ -179,8 +162,8 @@ public:
 
 private:
     uint16_t u0;
-    Content u1;
-    std::vector<Content> content;
+    std::pair<char*, uint32_t> u1;
+    std::vector<std::pair<char*, uint32_t>> content;
     std::string filePath;
 };
 
