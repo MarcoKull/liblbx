@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
         LbxFile lbx(argv[1]);
         std::cout << "Archive " << argv[1] << " contains " << lbx.size() << " files:\n";
         for (int i = 0; i < lbx.size(); ++i) {
-            std::cout << " " << i + 1 << ":\t" << lbx[i].size << " byte\n";
+            std::cout << " " << i + 1 << ":\t" << lbx[i].second << " byte\n";
         }
         return 0;
     } catch (std::exception &e) {
