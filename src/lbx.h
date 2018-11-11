@@ -42,7 +42,7 @@ public:
      * Throws exception if something goes wrong.
      */
     void save();
-    
+
     /**
      * Save lbx file to given path.
      * Throws exception if something goes wrong.
@@ -57,7 +57,7 @@ public:
      * @param path
      */
     void open(std::string path);
-    
+
     /**
      * Get path of lbx file.
      * @return path
@@ -83,7 +83,7 @@ public:
      * @return content
      */
     Content& operator[](uint16_t index);
-    
+
     /**
      * Calculate starting offset for given index.
      * @param index
@@ -96,14 +96,14 @@ public:
      * "Unknown" values will not be touched.
      */
     void clear();
-    
+
     /**
      * Add content to archive.
      * Added data will be deleted by this class.
      * @param content
      */
     void add(Content content);
-    
+
     /**
      * Add content to archive.
      * Added data will be deleted by this class.
@@ -111,7 +111,7 @@ public:
      * @param size
      */
     void add(char* data, uint32_t size);
-    
+
     /**
      * Insert content at given index.
      * Inserted data will be deleted by this class.
@@ -119,14 +119,14 @@ public:
      * @param content
      */
     void insert(uint16_t index, Content content);
-    
+
     /**
      * Switch content at given indexes.
      * @param index0
      * @param index1
      */
     void swap(uint16_t index0, uint16_t index1);
-    
+
     /**
      * Removes and deletes content at given index.
      * @param index
@@ -138,7 +138,7 @@ public:
      * @return uint16_t reference
      */
     uint16_t& unknown0();
-    
+
     /**
      * Get and set unknown space.
      * @return content reference
@@ -146,12 +146,25 @@ public:
     Content& unknown1();
 
     /**
+     * Calculate header size.
+     * @return header size
+     */
+    uint32_t headerSize();
+    
+    /**
+     * Calculate header size based on given number of files.
+     * @param nrOfFiles
+     * @return header size
+     */
+    static uint32_t headerSize(uint16_t nrOfFiles);
+
+    /**
      * Static function to easily switch endianess of a given number.
      * @param nr
      * @return uint32_t with switched endian
      */
     static uint16_t swap16(uint16_t nr);
-    
+
     /**
      * Static function to easily switch endianess of a given number.
      * @param nr
@@ -165,8 +178,6 @@ public:
     static const uint32_t SIGNATURE = 65197;
 
 private:
-    uint32_t headerSize();
-    static uint32_t headerSize(uint16_t nrOfFiles);
     uint16_t u0;
     Content u1;
     std::vector<Content> content;

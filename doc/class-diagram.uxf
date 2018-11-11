@@ -7,7 +7,7 @@
       <x>150</x>
       <y>70</y>
       <w>300</w>
-      <h>460</h>
+      <h>500</h>
     </coordinates>
     <panel_attributes>LbxFile
 --
@@ -34,6 +34,9 @@ remove(index: uint16_t): void
 
 unknown0(): uint16_t&amp;
 unknown1(): Content&amp;
+
+headerSize(): uint32_t
+_headerSize(nrOfFiles: uint16_t): uint32_t_
 
 _swap16(nr: uint16_t): uint16_t_
 _swap32(nr: uint32_t): uint32_t_
