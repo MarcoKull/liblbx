@@ -25,7 +25,7 @@
       ><text x="5" font-size="14px" y="53.5938" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >LbxFile(path: std::string)</text
       ><text x="5" font-size="14px" y="69.125" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >LbxFile(data: char*, size: uint32_t)</text
+      >LbxFile(data: std::pair&lt;char*, uint32_t&gt;)</text
       ><text x="5" font-size="14px" y="84.6562" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >~LbxFile()</text
       ><text x="5" font-size="14px" y="115.7188" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
@@ -37,7 +37,7 @@
       ><text x="5" font-size="14px" y="162.3125" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >open(path: std::string): void</text
       ><text x="5" font-size="14px" y="177.8438" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
-      >load(data: char*, size: uint32_t): void</text
+      >load(data: std::pair&lt;char*, uint32_t&gt;): void</text
       ><text x="5" font-size="14px" y="193.375" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"
       >path(): std::string</text
       ><text x="5" font-size="14px" y="224.4375" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none" xml:space="preserve"

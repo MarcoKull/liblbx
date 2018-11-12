@@ -13,14 +13,14 @@
 --
 LbxFile()
 LbxFile(path: std::string)
-LbxFile(data: char*, size: uint32_t)
+LbxFile(data: std::pair&lt;char*, uint32_t&gt;)
 ~LbxFile()
 
 save(): void
 save(path: std::string): void
 serialize(): std::pair&lt;char*, uint32_t&gt;
 open(path: std::string): void
-load(data: char*, size: uint32_t): void
+load(data: std::pair&lt;char*, uint32_t&gt;): void
 path(): std::string
 
 size(): uint16_t
