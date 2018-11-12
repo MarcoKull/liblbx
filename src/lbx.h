@@ -17,6 +17,13 @@ public:
     LbxFile();
 
     /**
+     * Construct a lbx file using given data in memory.
+     * Throws exception if something goes wrong.
+     * @param data
+     */
+    LbxFile(std::pair<char*, uint32_t> data);
+
+    /**
      * Load a lbx file from given path.
      * Throws exception if something goes wrong.
      * @param path
@@ -40,6 +47,13 @@ public:
      * @param path
      */
     void save(std::string path);
+    
+    /**
+     * Serialize lbx file.
+     * You have to take care of deleting the created data.
+     * @return 
+     */
+    std::pair<char*, uint32_t> serialize();
 
     /**
      * Open lbx file from given path.
@@ -48,6 +62,14 @@ public:
      * @param path
      */
     void open(std::string path);
+
+    /**
+     * Load a lbx file from give data in memory.
+     * Throws exception if something goes wrong.
+     * @param data
+     * @param size
+     */
+    void load(std::pair<char*, uint32_t> data);
 
     /**
      * Get path of lbx file.
@@ -133,27 +155,61 @@ public:
      * @return header size
      */
     uint32_t headerSize();
-    
+
     /**
-     * Calculate header size based on given number of files.
+     * Static function to calculate header size based on given number of files.
      * @param nrOfFiles
      * @return header size
      */
     static uint32_t headerSize(uint16_t nrOfFiles);
 
     /**
-     * Static function to easily switch endianess of a given number.
-     * @param nr
-     * @return uint32_t with switched endian
+     * Static function to read a uint8_t value from a data array.
+     * @param data
+     * @param offset
+     * @return 
      */
-    static uint16_t swap16(uint16_t nr);
+    static uint8_t read8(char* data, uint32_t offset);
 
     /**
-     * Static function to easily switch endianess of a given number.
-     * @param nr
-     * @return uint32_t with switched endian
+     * Static function to read a uint16_t value from a little endian data array.
+     * @param data
+     * @param offset
+     * @return 
      */
-    static uint32_t swap32(uint32_t nr);
+    static uint16_t read16(char* data, uint32_t offset);
+
+    /**
+     * Static function to read a uint32_t value from a little endian data array.
+     * @param data
+     * @param offset
+     * @return 
+     */
+    static uint32_t read32(char* data, uint32_t offset);
+
+    /**
+     * Static function to write a uint8_t value to a data array.
+     * @param data
+     * @param offset
+     * @return 
+     */
+    static void write8(char* data, uint32_t offset, uint8_t value);
+
+    /**
+     * Static function to write a uint16_t value to a little endian data array.
+     * @param data
+     * @param offset
+     * @return 
+     */
+    static void write16(char* data, uint32_t offset, uint16_t value);
+
+    /**
+     * Static function to write a uint32_t value to a little endian data array.
+     * @param data
+     * @param offset
+     * @return 
+     */
+    static void write32(char* data, uint32_t offset, uint32_t value);
 
     /**
      * 4byte signature at byte 2 to 6.

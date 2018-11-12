@@ -13,6 +13,10 @@ LbxFile::LbxFile(std::string _path) : LbxFile() {
     open(_path);
 }
 
+LbxFile::LbxFile(std::pair<char*, uint32_t> _data) {
+    load(_data);
+}
+
 LbxFile::~LbxFile() {
     clear();
     delete[] u1.first;
@@ -53,16 +57,6 @@ std::pair<char*, uint32_t>& LbxFile::unknown1() {
     return u1;
 }
 
-#define LBX_WRITE_16(x) {\
-    uint16_t w16 = x;\
-    o.write((char*) &w16, 2);\
-}
-
-#define LBX_WRITE_32(x) {\
-    uint32_t w32 = x;\
-    o.write((char*) &w32, 4);\
-}
-
 void LbxFile::save() {
     save(path());
 }
@@ -72,25 +66,40 @@ void LbxFile::save(std::string _path) {
     if (!o.good()) {
         throw std::runtime_error("could not write to '" + _path + "'");
     }
-
-    LBX_WRITE_16(size());
-    LBX_WRITE_32(SIGNATURE);
-    LBX_WRITE_16(u0);
-
-    uint32_t offset = headerSize() + unknown1().second;
-    LBX_WRITE_32(offset);
-    for (uint16_t i = 0; i < size(); ++i) {
-        offset += at(i).second;
-        LBX_WRITE_32(offset);
-    }
-
-    o.write(u1.first, u1.second);
-
-    for (uint16_t i = 0; i < size(); ++i) {
-        o.write(at(i).first, at(i).second);
-    }
-
+    std::pair<char*, uint32_t> d = serialize();
+    o.write(d.first, d.second);
+    delete[] d.first;
     filePath = _path;
+}
+
+std::pair<char*, uint32_t> LbxFile::serialize() {
+    // get size and create array
+    uint32_t s = offset(size());
+    char* d = new char[s];
+    
+    // write header
+    write16(d, 0, size());
+    write32(d, 2, SIGNATURE);
+    write16(d, 6, u0);
+    
+    // write offsets
+    for (uint16_t i = 0; i <= size(); ++i) {
+        write32(d, 8 + 4 * i, offset(i));
+    }
+    
+    // write unknown area
+    for (uint32_t i = 0; i < u1.second; ++i) {
+        d[headerSize() + i] = u1.first[i];
+    }
+    
+    // write content
+    for (uint16_t i = 0; i < size(); ++i) {
+        for (uint32_t j = 0; j < at(i).second; ++j) {
+            d[offset(i) + j] = at(i).first[j];
+        }
+    }
+    
+    return {d, s};
 }
 
 uint32_t LbxFile::offset(uint16_t _index) {
@@ -109,13 +118,30 @@ uint32_t LbxFile::headerSize(uint16_t _nrOfFiles) {
     return _nrOfFiles * 4 + 12;
 }
 
-uint16_t LbxFile::swap16(uint16_t _nr) {
-    return (uint16_t) ((_nr << 8) | (_nr >> 8));
+uint8_t LbxFile::read8(char* _data, uint32_t _offset) {
+    return (uint8_t) _data[_offset];
 }
 
-uint32_t LbxFile::swap32(uint32_t _nr) {
-    _nr = ((_nr << 8) & 0xFF00FF00) | ((_nr >> 8) & 0xFF00FF);
-    return (_nr << 16) | (_nr >> 16);
+uint16_t LbxFile::read16(char* _data, uint32_t _offset) {
+    return (uint16_t) (read8(_data, _offset) | read8(_data, _offset + 1) << 8);
+}
+
+uint32_t LbxFile::read32(char* _data, uint32_t _offset) {
+    return (uint32_t) (read16(_data, _offset) | read16(_data, _offset + 2) << 16);
+}
+
+void LbxFile::write8(char* _data, uint32_t _offset, uint8_t _value) {
+    _data[_offset] = (char) _value;
+}
+
+void LbxFile::write16(char* _data, uint32_t _offset, uint16_t _value) {
+    write8(_data, _offset, (uint8_t) _value);
+    write8(_data, _offset + 1, (uint8_t) (_value >> 8));
+}
+
+void LbxFile::write32(char* _data, uint32_t _offset, uint32_t _value) {
+    write16(_data, _offset, (uint16_t) _value);
+    write16(_data, _offset + 2, (uint16_t) (_value >> 16));
 }
 
 void LbxFile::remove(uint16_t _index) {
@@ -133,70 +159,73 @@ void LbxFile::swap(uint16_t index0, uint16_t index1) {
     at(index1) = p;
 }
 
-#define LBX_OPEN_ERROR(x)\
-throw std::runtime_error("could not open '" + _path + "' - invalid " + x);
-
 void LbxFile::open(std::string _path) {
-    // open file at the end to get file size, then set pointer to beginning
-    std::ifstream file(_path, std::ifstream::ate | std::ifstream::binary);
-    if (!file.good()) {
-        LBX_OPEN_ERROR("file");
-    }
-    std::ifstream::pos_type fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // check if file size is big enought for header
-    if (fileSize < 12 || fileSize > UINT32_MAX) {
-        LBX_OPEN_ERROR("size");
+    std::ifstream f(_path, std::ifstream::ate | std::ifstream::binary);
+    if (!f.good()) {
+        throw std::runtime_error("could not read file");
     }
 
-    uint16_t nrOfFiles;
-    file.read((char*) & nrOfFiles, 2);
-    if (fileSize < (uint32_t) (12 + nrOfFiles * 4)) {
-        LBX_OPEN_ERROR("size");
+    uint32_t s = (uint32_t) f.tellg();
+    char* d = new char[s];
+    f.seekg(0);
+    f.read(d, s);
+
+    load({d, s});
+    delete[] d;
+
+    filePath = _path;
+}
+
+void LbxFile::load(std::pair<char*, uint32_t> _data) {
+
+    // check if size is big enought for header
+    if (_data.second < 12 || _data.second > UINT32_MAX) {
+        throw std::runtime_error("too small");
     }
 
-    uint32_t signature;
-    file.read((char*) & signature, 4);
-    if (signature != SIGNATURE) {
-        LBX_OPEN_ERROR("signature");
+    // read number of files and check file size again
+    uint16_t nrOfFiles = read16(_data.first, 0);
+    if (_data.second < (uint32_t) (12 + nrOfFiles * 4)) {
+        throw std::runtime_error("too small for header");
     }
 
-    uint16_t wtf;
-    file.read((char*) &wtf, 2);
+    // check signature
+    if (read32(_data.first, 2) != SIGNATURE) {
+        throw std::runtime_error("invalid signature");
+    }
 
-    uint32_t* offsets = new uint32_t[nrOfFiles + 1];
-    for (uint16_t i = 0; i <= nrOfFiles; ++i) {
-        file.read((char*) & offsets[i], 4);
-        if (i > 0 && (offsets[i] < offsets[i - 1] || offsets[i] > fileSize)) {
-            delete[] offsets;
-            LBX_OPEN_ERROR("offset");
+    // check if offsets make sense
+    for (uint16_t i = 0; i < nrOfFiles; ++i) {
+        if (read32(_data.first, 8 + i * 4) > read32(_data.first, 8 + i * 4)) {
+            throw std::runtime_error("invalid offsets");
         }
     }
 
-    if ((uint32_t) fileSize != offsets[nrOfFiles]) {
-        delete[] offsets;
-        LBX_OPEN_ERROR("offset");
+    // check if last offset matches file size
+    if (read32(_data.first, 8 + nrOfFiles * 4) != _data.second) {
+        throw std::runtime_error("invalid offset");
     }
 
     // file is good, clean up
     clear();
     delete[] u1.first;
-    filePath = _path;
 
-    // save unknown data
-    u0 = wtf;
-    u1.second = offsets[0] - headerSize(nrOfFiles);
+    // read unknown data
+    u0 = read16(_data.first, 6);
+    u1.second = read32(_data.first, 8) - headerSize(nrOfFiles);
     u1.first = new char[u1.second];
-    file.read(u1.first, u1.second);
+    for (uint32_t i = 0; i < u1.second; ++i) {
+        u1.first[i] = _data.first[headerSize(nrOfFiles) + i];
+    }
 
     // read file data
     for (uint16_t i = 0; i < nrOfFiles; ++i) {
-        uint32_t s = offsets[i + 1] - offsets[i];
+        uint32_t o = read32(_data.first, 8 + i * 4);
+        uint32_t s = read32(_data.first, 12 + i * 4) - o;
         char* d = new char[s];
-        file.read(d, s);
+        for (uint32_t j = 0; j < s; ++j) {
+            d[j] = _data.first[o + j];
+        }
         add({d, s});
     }
-
-    delete[] offsets;
 }
