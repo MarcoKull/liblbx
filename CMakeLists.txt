@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 project(liblbx)
 
 # compiler options
-if(NOT MSVC)
+if(MSVC)
+    if (BUILD_SHARED_LIBS)
+        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS true)
+    endif()
+else()
     add_definitions(-std=c++11 -pipe -pedantic -Wall -Wconversion)
 endif()
 
